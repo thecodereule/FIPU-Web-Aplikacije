@@ -30,6 +30,7 @@ app.get('/pizze/:id', (req, res) => {
 
     if (isNaN(id_pizza)) {
         res.json({ message: 'Prosljedili se parametar id koji nije broj' });
+        return;
     }
 
     const pizza = pizze.find(pizza => pizza.id == id_pizza)
@@ -41,35 +42,58 @@ app.get('/pizze/:id', (req, res) => {
 });
 
 app.post('/naruci', (req, res) => {
-    const narudzbe_zahtjev = req.body;
+    const { narudzba, klijent } = req.body;
 
-    if (!Array.isArray(narudzbe_zahtjev)) {
-        res.send('Podaci moraju biti niz objekata');
+    // Provjera jesu li svi potrebni podaci poslani
+    if (!narudzba || !klijent || !klijent.prezime || !klijent.adresa || !klijent.broj_telefona) {
+        return res.json({ message: 'Niste poslali sve potrebne podatke za narudzbu' });
+    }
+
+    if (!Array.isArray(narudzba)) {
+        res.send('Narudzba mora biti niz objekata');
         return;
     }
 
-    for (let narudzba of narudzbe_zahtjev) {
-        const kljucevi = Object.keys(narudzba);
+    for (let stavka of narudzba) {
+        const kljucevi = Object.keys(stavka);
 
-        if (!kljucevi.includes('pizza') && kljucevi.includes('velicina') && kljucevi.includes('kolicina')) {
-            res.send('Niste poslali sve potrebne podatke za nardzbu')
+        if (!(kljucevi.includes('pizza') && kljucevi.includes('velicina') && kljucevi.includes('kolicina'))) {
+            res.send('Niste poslali sve potrebne podatke za stavku narudzbe');
             return;
         }
 
-        const pizza = pizze.find(p => p.naziv === narudzba.pizza);
+        const pizza = pizze.find(p => p.naziv === stavka.pizza);
         if (!pizza) {
-            res.send(`Pizza ${narudzba.pizza} ne postoji u jelovniku`)
-            return
+            return res.send(`Pizza ${stavka.pizza} ne postoji u jelovniku`);
         }
     }
 
-    for (let narudzba of narudzbe_zahtjev) {
-        narudzbe.push(narudzba)
+    let ukupna_cijena = 0;
+    const pizza_nazivi = [];
+
+    for (let stavka of narudzba) {
+        const pizza = pizze.find(p => p.naziv === stavka.pizza);
+        const cijena = pizza.cijene[stavka.velicina];
+        ukupna_cijena += cijena * stavka.kolicina;
+        pizza_nazivi.push(`${stavka.pizza}_${stavka.velicina}`);
     }
 
-    console.log('Primljeni podaci: ', narudzbe_zahtjev)
-    res.send(`Uspješno zaprimljena narudžba za ${narudzbe_zahtjev.length} pizze.`);
-})
+    const novaNarudzba = {
+        narudzba: narudzba,
+        klijent: klijent,
+        ukupna_cijena: ukupna_cijena
+    };
+
+    narudzbe.push(novaNarudzba);
+
+    console.log('Primljeni podaci: ', req.body);
+
+    res.json({
+        message: `Vaša narudžba za ${pizza_nazivi.join(' i ')} je uspješno zaprimljena!`,
+        klijent: klijent,
+        ukupna_cijena: ukupna_cijena
+    });
+});
 
 app.listen(PORT, error => {
     if (error) {
