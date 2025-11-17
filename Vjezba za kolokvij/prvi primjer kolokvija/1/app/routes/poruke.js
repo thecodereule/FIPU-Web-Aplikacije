@@ -1,13 +1,6 @@
 import express from 'express';
 const router = express.Router();
 
-let poruke = [
-    { id: 1, posiljatelj: 'Ana', sadrzaj: 'Pozdrav!' },
-    { id: 2, posiljatelj: 'Ivan', sadrzaj: 'Bok!' },
-    { id: 3, posiljatelj: 'Mate', sadrzaj: 'Ćao!' },
-    { id: 4, posiljatelj: 'Jana', sadrzaj: 'Hello!' },
-    { id: 5, posiljatelj: 'Maja', sadrzaj: 'Hi!' }
-];
 
 router.get('/', (req, res) => {
     const { posiljatelj } = req.query
