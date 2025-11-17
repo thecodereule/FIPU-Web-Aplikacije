@@ -24,13 +24,13 @@ router.get('/', (req, res) => {
 
     const filtriranePorukePoPosaljitelju = poruke.filter(p => p.posiljatelj === posiljatelj);
 
-    if (filtriranePorukePoPosaljitelju === 0) {
+    if (filtriranePorukePoPosaljitelju.length === 0) {
         return res.status(404).json({
-            message: `Nema poruka od posaljitelja: ${posaljitelj}`
+            message: `Nema poruka od posaljitelja: ${posiljatelj}`
         })
     }
 
-    res.status(200).json(poruke)
+    res.status(200).json(filtriranePorukePoPosaljitelju)
 })
 
 router.get('/:id', (req, res) => {
