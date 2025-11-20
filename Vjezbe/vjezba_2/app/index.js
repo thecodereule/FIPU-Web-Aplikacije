@@ -31,29 +31,28 @@ app.get('/pizze/:naziv', (req, res) => {
     let naziv_pizze = req.params.naziv;
 
     let trazena_pizza = dostupne_pizze.find(p => p.naziv === naziv_pizze)
-    
+
     if (trazena_pizza) {
         return res.json(trazena_pizza);
     }
-    return res.json({poruka: "Ne postoji trazena pizza"})
+    return res.json({ poruka: "Ne postoji trazena pizza" })
 })
 
 app.post('/pizze', (req, res) => {
     let pizza_dodavanje = req.body
 
-    if (!req.body) 
-    {
-        return res.json({greska: "http body je prazan"})
+    if (!req.body) {
+        return res.json({ greska: "http body je prazan" })
     }
 
     let postojeca = dostupne_pizze.find(p => p.naziv === pizza_dodavanje.naziv);
     if (postojeca) {
-        res.json({greska: `Pizza s nazivom ${postojeca.naziv} vec postoji`})
+        res.json({ greska: `Pizza s nazivom ${postojeca.naziv} vec postoji` })
     }
 
     const novi_id = dostupne_pizze.at(-1)['id'] + 1;
 
-    dostupne_pizze.push({id: novi_id, ...pizza_dodavanje})
+    dostupne_pizze.push({ id: novi_id, ...pizza_dodavanje })
     res.json(dostupne_pizze);
 })
 
@@ -66,8 +65,49 @@ app.delete('/pizze/:naziv', (req, res) => {
         dostupne_pizze.splice(pizza_za_brisanje, 1)
         return res.json(dostupne_pizze)
     } else {
-        return res.json({poruka: "Ne mogu pronaci pizzu"})
+        return res.json({ poruka: "Ne mogu pronaci pizzu" })
     }
+})
+
+app.put('/pizze/:naziv', (req, res) => {
+    let naziv_pizza_zamjena = req.params.naziv;
+    let nova_pizza = req.body;
+
+    let pizza_zamjena = dostupne_pizze.find(p => p.naziv == naziv_pizza_zamjena);
+
+    if (!pizza_zamjena) {
+        return res.json({ greska: `Pizza s nazivom ${naziv_pizza_zamjena} ne postoji.` })
+    }
+    let postojeci_id = pizza_zamjena.id;
+
+    let pizza_zamjena_index = dostupne_pizze.indexOf(pizza_zamjena);
+
+    let novi_zapis = {
+        id: postojeci_id,
+        naziv: nova_pizza.naziv,
+        cijena: nova_pizza.cijena
+    }
+
+    dostupne_pizze.splice(pizza_zamjena_index, 1, novi_zapis)
+
+    console.log(novi_zapis)
+    return res.send(dostupne_pizze)
+})
+
+app.patch('/pizze/:id', (req, res) => {
+    let pizza_za_patch_id = req.params.id
+
+    if (!req.body) {
+        return res.json({ poruka: "NOT OK" })
+    }
+
+    let { cijena } = req.body;
+
+    let pizza_patch_index = dostupne_pizze.findIndex(p => p.id == pizza_za_patch_id)
+
+    dostupne_pizze[pizza_patch_index].cijena = cijena;
+
+    return res.json(dostupne_pizze)
 })
 
 app.listen(PORT, (error) => {
