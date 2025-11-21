@@ -1,0 +1,43 @@
+[
+  {
+    "id": 1,
+    "posiljatelj": "Ana",
+    "sadrzaj": "Pozdrav!"
+  },
+  {
+    "id": 2,
+    "posiljatelj": "Ivan",
+    "sadrzaj": "Bok!"
+  },
+  {
+    "id": 3,
+    "posiljatelj": "Mate",
+    "sadrzaj": "Ćao!"
+  },
+  {
+    "id": 4,
+    "posiljatelj": "Jana",
+    "sadrzaj": "Hello!"
+  },
+  {
+    "id": 5,
+    "posiljatelj": "Maja",
+    "sadrzaj": "Hi!"
+  },
+  {
+    "id": 6,
+    "posiljatelj": "Ferrucio Ferrari",
+    "sadrzaj": "Gracias"
+  },
+  {
+    "id": 7,
+    "posiljatelj": "Pero",
+    "sadrzaj": "Daj odgovori..."
+  },
+  {
+    "id": 8,
+    "posiljatelj": "Pero",
+    "sadrzaj": "Daj odgovori...",
+    "created_at": "2025-11-21T11:43:36.534Z"
+  }
+]

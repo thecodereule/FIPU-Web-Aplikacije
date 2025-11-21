@@ -1,0 +1,27 @@
+[
+    {
+        "id": 1,
+        "ime": "Ana",
+        "prezime": "Anić"
+    },
+    {
+        "id": 2,
+        "ime": "Ivan",
+        "prezime": "Ivić"
+    },
+    {
+        "id": 3,
+        "ime": "Mate",
+        "prezime": "Matić"
+    },
+    {
+        "id": 4,
+        "ime": "Jana",
+        "prezime": "Janić"
+    },
+    {
+        "id": 5,
+        "ime": "Maja",
+        "prezime": "Majić"
+    }
+]
