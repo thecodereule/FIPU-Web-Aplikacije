@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "ime": "Ivan",
+    "prezime": "Ivanovic"
+  },
+  {
+    "id": 2,
+    "ime": "Marko",
+    "prezime": "Markovic"
+  },
+  {
+    "id": 3,
+    "ime": "Pero",
+    "prezime": "Peric"
+  },
+  {
+    "id": 4,
+    "ime": "Boban",
+    "prezime": "Bobanovic"
+  },
+  {
+    "id": 5,
+    "ime": "Pavo",
+    "prezime": "Pavin"
+  },
+  {
+    "id": 6,
+    "ime": "Pavo",
+    "prezime": "Pavin"
+  },
+  {
+    "id": 7,
+    "ime": "Pavo",
+    "prezime": "Pavin"
+  },
+  {
+    "id": 8,
+    "ime": "Ana",
+    "prezime": "Anic"
+  },
+  {
+    "id": 9,
+    "ime": "Pivo",
+    "prezime": "Pivic"
+  }
+]
