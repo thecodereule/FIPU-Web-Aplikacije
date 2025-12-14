@@ -9,13 +9,19 @@
       ×
     </button>
 
+    <div
+      v-if="statusPoruka"
+      :class="[
+        'mb-4 p-4 rounded-lg text-center font-semibold',
+        statusPoruka.tip === 'success' ? 'bg-green-600/80 text-white' : 'bg-red-600/80 text-white',
+      ]"
+    >
+      {{ statusPoruka.tekst }}
+    </div>
+
     <!-- Forma za dostavu -->
     <div class="mb-4 pb-4 border-b border-slate-600">
-      <DeliveryForm
-        v-model:prezime="prezime"
-        v-model:adresa="adresa"
-        v-model:telefon="telefon"
-      />
+      <DeliveryForm v-model:prezime="prezime" v-model:adresa="adresa" v-model:telefon="telefon" />
     </div>
 
     <!-- Ostatak elemenata -->
@@ -140,6 +146,7 @@ import DeliveryForm from './DeliveryForm.vue'
 const prezime = ref('')
 const adresa = ref('')
 const telefon = ref('')
+const statusPoruka = ref(null)
 
 const props = defineProps({
   odabranaPizza: {
@@ -183,12 +190,20 @@ function obrisiStavku(index) {
 
 async function naruciPizze() {
   try {
+    statusPoruka.value = null
+
     if (narucene_pizze.value.length === 0) {
-      alert('Košarica je prazna! Molimo dodajte pizze prije narudžbe.')
+        statusPoruka.value = {
+            tip: 'error',
+            tekst: 'Kosarica je prazna! Molimo dodajte pizze prije narudzbe.'
+        }
       return
     }
     if (!prezime.value.trim() || !adresa.value.trim() || !telefon.value.trim()) {
-      alert('Unesite prezime, adresu i telefon.')
+      statusPoruka.value = {
+        tip: 'error',
+        tekst: 'Molim unesite sve podatke za dostavu (prezime, adresa, telefon).'
+      }
       return
     }
 
@@ -202,10 +217,26 @@ async function naruciPizze() {
     })
 
     console.log('Narudžba uspješno poslana:', rezultat.data)
-    alert('Hvala! Vaša narudžba je uspješno poslana.')
+    statusPoruka.value = {
+        tip: 'success',
+        tekst: rezultat.data.message || 'Hvala! vasa narudzba je uspjesno poslana.'
+    }
+
+    // ocisti kosaricu i formu nakon 3 sekunde
+    setTimeout(() => {
+        narucene_pizze.value = []
+        prezime.value = ''
+        adresa.value = ''
+        telefon.value = ''
+        statusPoruka.value = null
+    }, 3000)
+    
   } catch (error) {
     console.log(`Greska prilikom narucivanja: ${error}`)
-    alert('Doslo je do greske pri slanju narudzbe. Molimo pokusajte ponovno')
+    statusPoruka.value = {
+        tip: 'error',
+        tekst: error.response?.data?.message || 'Došlo je do greške pri slanju narudžbe. Molimo pokušajte ponovno.' 
+    }
   }
 }
 </script>
