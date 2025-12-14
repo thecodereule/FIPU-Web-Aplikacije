@@ -1,6 +1,6 @@
 <template>
   <Header></Header>
-  <PizzaList></PizzaList>
+  <RouterView />
 </template>
 
 <script setup>

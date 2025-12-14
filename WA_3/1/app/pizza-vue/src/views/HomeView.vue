@@ -1,9 +1,7 @@
 <script setup>
-import TheWelcome from '../components/TheWelcome.vue'
+import PizzaList from '@/components/PizzaList.vue';
 </script>
 
 <template>
-  <main>
-    <TheWelcome />
-  </main>
+  <PizzaList />
 </template>
