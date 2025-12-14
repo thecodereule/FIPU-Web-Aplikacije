@@ -15,6 +15,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
     "axios": "^1.13.2",
+    "oh-vue-icons": "^1.0.0-rc3",
     "tailwindcss": "^4.1.18",
     "vue": "^3.5.25",
     "vue-router": "^4.6.3"
