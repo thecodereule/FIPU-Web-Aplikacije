@@ -9,11 +9,11 @@
         :key="pizza.naziv"
         :class="[
           'bg-inherit rounded-xl overflow-hidden cursor-pointer transition-all duration-300',
-          odabrana_pizza === pizza.naziv
+          odabrana_pizza?.naziv === pizza.naziv
             ? 'ring-4 ring-orange-300 shadow-lg shadow-orange-300/50 scale-[1.02]'
             : 'hover:scale-[1.01]',
         ]"
-        @click="odaberi_pizzu(pizza.naziv)"
+        @click="odaberi_pizzu(pizza)"
       >
         <div
           class="w-full h-48 flex items-center justify-center bg-inherit overflow-hidden rounded-xl"
@@ -49,10 +49,16 @@
         </div>
       </div>
     </div>
+    <OrderFooter
+      v-if="odabrana_pizza != null"
+      :odabrana-pizza="odabrana_pizza"
+      @close="odabrana_pizza = null"
+    ></OrderFooter>
   </div>
 </template>
 
 <script setup>
+import OrderFooter from './OrderFooter.vue'
 import { addIcons } from 'oh-vue-icons'
 import {
   GiTomato,
@@ -110,7 +116,7 @@ const ikoneSastojaka = {
 
 function odaberi_pizzu(novaPizza) {
   odabrana_pizza.value = novaPizza
-  console.log(`Odabrana pizza je: ${odabrana_pizza.value}`)
+  console.log(`Odabrana pizza je: ${odabrana_pizza.value.naziv}`)
 }
 
 async function dohvati_pizze() {
@@ -125,5 +131,11 @@ async function dohvati_pizze() {
 
 onMounted(() => {
   dohvati_pizze()
+
+  window.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      odabrana_pizza.value = null // poništavamo odabir pizze
+    }
+  })
 })
 </script>

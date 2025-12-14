@@ -40,6 +40,7 @@ dostupna za pizzu '${narucena.naziv}'.`
         podaci_dostava
     };
     narudzbe.push(nova_narudzba);
+    console.log(`Uspjesno kreirana narudzbe: ${nova_narudzba}`)
     res.status(201).json({
         message: 'Narudžba je uspješno kreirana.', narudzba:
             nova_narudzba
