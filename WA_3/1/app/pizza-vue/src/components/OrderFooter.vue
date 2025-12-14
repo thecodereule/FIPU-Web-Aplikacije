@@ -181,8 +181,11 @@ async function naruciPizze() {
 
     const rezultat = await axios.post(`${URL_express}/narudzbe`, {
       narucene_pizze: narucene_pizze.value,
-      adresa_dostava: adresa.value.trim(),
-      broj_telefona: telefon.value.trim(),
+      podaci_dostava: {
+        prezime: prezime.value.trim(),
+        adresa: adresa.value.trim(),
+        telefon: telefon.value.trim(),
+      },
     })
 
     console.log('Narudžba uspješno poslana:', rezultat.data)

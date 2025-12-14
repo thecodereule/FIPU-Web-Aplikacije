@@ -48,4 +48,8 @@ dostupna za pizzu '${narucena.naziv}'.`
 });
 
 
+router.get('/', (req, res) => {
+    return res.status(200).json(narudzbe);
+})
+
 export default router;
