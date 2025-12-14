@@ -115,8 +115,16 @@
           <div class="text-white">
             {{ stavka.naziv }} ({{ stavka.velicina }}) x{{ stavka.kolicina }}
           </div>
-          <div class="text-orange-400 font-semibold">
-            {{ (stavka.cijenaPoKomadu * stavka.kolicina).toFixed(2) }}€
+          <div class="flex items-center gap-3">
+            <div class="text-orange-400 font-semibold">
+              {{ (stavka.cijenaPoKomadu * stavka.kolicina).toFixed(2) }}€
+            </div>
+            <button
+              @click="obrisiStavku(index)"
+              class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-sm transition-all cursor-pointer"
+            >
+              x
+            </button>
           </div>
         </li>
       </ul>
@@ -166,6 +174,11 @@ function dodajUNarudzbu() {
   for (let stavka of narucene_pizze.value) {
     console.log(stavka)
   }
+}
+
+function obrisiStavku(index) {
+  narucene_pizze.value.splice(index, 1)
+  console.log(`Obrisana stavka na poziciji ${index}`)
 }
 
 async function naruciPizze() {
