@@ -48,17 +48,17 @@
           <div class="space-y-2">
             <div class="flex justify-between text-gray-700">
               <span class="font-medium">Mala</span>
-              <span>€00.00</span>
+              <span>€{{ pizza.cijene.mala }}</span>
             </div>
 
             <div class="flex justify-between text-gray-700">
               <span class="font-medium">Srednja</span>
-              <span>€00.00</span>
+              <span>€{{ pizza.cijene.srednja }}</span>
             </div>
 
             <div class="flex justify-between text-gray-700">
               <span class="font-medium">Jumbo</span>
-              <span>€00.00</span>
+              <span>€{{ pizza.cijene.jumbo }}</span>
             </div>
           </div>
         </div>
