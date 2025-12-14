@@ -1,8 +1,9 @@
-<script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <div class="text-red-500 underline text-5xl">Hello world</div>
+  <Header></Header>
+  <PizzaList></PizzaList>
 </template>
+
+<script setup>
+import PizzaList from './components/PizzaList.vue'
+import Header from './components/Header.vue';
+</script>
