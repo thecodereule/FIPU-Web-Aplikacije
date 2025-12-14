@@ -15,12 +15,10 @@
         ]"
         @click="odaberi_pizzu(pizza.naziv)"
       >
-        <div class="w-full h-48 flex items-center justify-center bg-inherit">
-          <img
-            src="https://www.freeiconspng.com/uploads/pizza-png-1.png"
-            alt="Pizza Image 1"
-            class="w-full h-full object-contain"
-          />
+        <div
+          class="w-full h-48 flex items-center justify-center bg-inherit overflow-hidden rounded-xl"
+        >
+          <img :src="pizza.slika_url" :alt="pizza.slika_url" class="w-full h-full object-cover" />
         </div>
 
         <div class="p-6">
