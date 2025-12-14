@@ -8,6 +8,17 @@
     >
       ×
     </button>
+
+    <!-- Forma za dostavu -->
+    <div class="mb-4 pb-4 border-b border-slate-600">
+      <DeliveryForm
+        v-model:prezime="prezime"
+        v-model:adresa="adresa"
+        v-model:telefon="telefon"
+      />
+    </div>
+
+    <!-- Ostatak elemenata -->
     <div
       class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center sm:items-center justify-between gap-4 sm:gap-6"
     >
@@ -17,10 +28,9 @@
       >
         <img
           :src="odabranaPizza.slika_url"
-          alt="odabranaPizza.naziv"
+          :alt="odabranaPizza.naziv"
           class="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover shadow-md shadow-black/40"
         />
-
         <div>
           <h3 class="font-bold tracking-wide text-base sm:text-lg text-orange-400">
             {{ odabranaPizza.naziv }}
@@ -56,13 +66,11 @@
           >
             -
           </button>
-
           <div
             class="px-3 py-1 bg-slate-600/40 backdrop-blur-sm rounded-md border border-slate-500 text-sm sm:text-base"
           >
             {{ odabranaKolicina }}
           </div>
-
           <button
             @click="odabranaKolicina++"
             class="w-8 h-8 flex items-center justify-center rounded-full bg-orange-500 text-white font-bold hover:bg-orange-600 transition-all cursor-pointer"
@@ -70,7 +78,6 @@
             +
           </button>
         </div>
-
         <div
           class="text-center font-semibold text-lg text-orange-400 tracking-wide whitespace-nowrap"
         >
@@ -78,6 +85,7 @@
         </div>
       </div>
 
+      <!-- Gumbi -->
       <button
         @click="dodajUNarudzbu()"
         class="bg-orange-500 text-white font-semibold px-4 py-2 rounded-xl shadow-md shadow-black/40 hover:bg-orange-600 transition-all tracking-wide cursor-pointer w-full sm:w-auto text-center"
@@ -86,16 +94,16 @@
       </button>
       <button
         @click="naruciPizze()"
-        class="bg-orange-500 text-white font-semibold px-4 py-2 rounded-xl shadow-md shadowblack/40 hover:bg-orange-600 transition-all tracking-wide cursor-pointer w-full sm:w-auto text-center"
+        class="bg-orange-500 text-white font-semibold px-4 py-2 rounded-xl shadow-md shadow-black/40 hover:bg-orange-600 transition-all tracking-wide cursor-pointer w-full sm:w-auto text-center"
       >
         Naruči
       </button>
     </div>
-    <!-- app/pizza-vue/src/components/OrderFooter.vue -->
-    ...
+
+    <!-- Košarica -->
     <div
       v-if="narucene_pizze.length"
-      class="mt-4 max-w-2xl mx-auto max-h-40 overflow-y-auto bg-slate-800/50 backdropblur-sm rounded-lg p-3 border border-slate-600"
+      class="mt-4 max-w-2xl mx-auto max-h-40 overflow-y-auto bg-slate-800/50 backdrop-blur-sm rounded-lg p-3 border border-slate-600"
     >
       <h4 class="font-semibold text-lg text-white mb-2">Stavke u košarici:</h4>
       <ul class="space-y-2">
@@ -108,7 +116,7 @@
             {{ stavka.naziv }} ({{ stavka.velicina }}) x{{ stavka.kolicina }}
           </div>
           <div class="text-orange-400 font-semibold">
-            {{ (props.odabranaPizza.cijene[stavka.velicina] * stavka.kolicina).toFixed(2) }}€
+            {{ (stavka.cijenaPoKomadu * stavka.kolicina).toFixed(2) }}€
           </div>
         </li>
       </ul>
@@ -119,6 +127,11 @@
 <script setup>
 import { ref, computed } from 'vue'
 import axios from 'axios'
+import DeliveryForm from './DeliveryForm.vue'
+
+const prezime = ref('')
+const adresa = ref('')
+const telefon = ref('')
 
 const props = defineProps({
   odabranaPizza: {
@@ -140,10 +153,12 @@ const ukupna_cijena_stavke = computed(() => {
 })
 
 function dodajUNarudzbu() {
+  const cijenaPoKomadu = props.odabranaPizza.cijene[odabranaVelicina.value]
   const novaStavka = {
     naziv: props.odabranaPizza.naziv,
     velicina: odabranaVelicina.value,
     kolicina: odabranaKolicina.value,
+    cijenaPoKomadu,
   }
   narucene_pizze.value.push(novaStavka)
   console.log(`Dodajem pizzu u kosaricu: ${novaStavka.naziv}`)
@@ -159,16 +174,15 @@ async function naruciPizze() {
       alert('Košarica je prazna! Molimo dodajte pizze prije narudžbe.')
       return
     }
-
-    const podaciZaDostavu = {
-      prezime: 'Pilić',
-      adresa: 'Ilica 305, Zagreb',
-      telefon: '091234567',
+    if (!prezime.value.trim() || !adresa.value.trim() || !telefon.value.trim()) {
+      alert('Unesite prezime, adresu i telefon.')
+      return
     }
 
-    let rezultat = await axios.post(`${URL_express}/narudzbe`, {
+    const rezultat = await axios.post(`${URL_express}/narudzbe`, {
       narucene_pizze: narucene_pizze.value,
-      podaci_dostava: podaciZaDostavu,
+      adresa_dostava: adresa.value.trim(),
+      broj_telefona: telefon.value.trim(),
     })
 
     console.log('Narudžba uspješno poslana:', rezultat.data)
