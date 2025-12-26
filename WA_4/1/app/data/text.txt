@@ -1,0 +1,1 @@
+Ovo je tekst koji smo pohranili asinkrono u datoteku kroz Callback patten i w flag
