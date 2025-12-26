@@ -44,7 +44,7 @@ app.get("/zaposlenici", async (req, res) => {
 
     if (godine_staza_max) {
       zaposlenici = zaposlenici.filter(
-        (z) => godine_staza <= parseInt(godine_staza_max)
+        (z) => z.godine_staza <= parseInt(godine_staza_max)
       );
     }
 
