@@ -3,7 +3,7 @@ import { config } from "dotenv";
 
 config()
 
-let mongoURI = process.env.mongoURI
+let mongoURI = process.env.MONGO_URI;
 let db_name = process.env.MONGO_DB_NAME
 const cluster = "FIPU-WA-Cluster";
 
