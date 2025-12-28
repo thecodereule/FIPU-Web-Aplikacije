@@ -101,6 +101,18 @@ app.put("/pizze", async (req, res) => {
   }
 });
 
+app.patch('/pizze', async (req, res) => {
+  let pizze_collection = db.collection('pizze')
+
+  try {
+    let result = await pizze_collection.updateMany({cijena: {$lt: 15}}, {$inc: {cijena: 2}})
+    res.status(200).json({modifiedCount: result.modifiedCount})
+  } catch (error) {
+    console.log(error.errorResponse)
+    res.status(400).json({error: error.errorResponse})
+  }
+})
+
 app.delete("/pizze/:naziv", async (req, res) => {
   let pizze_collection = db.collection("pizze");
   let naziv_param = req.params.naziv;
