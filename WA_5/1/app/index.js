@@ -14,9 +14,31 @@ app.get("/", (req, res) => {
 });
 
 app.get("/pizze", async (req, res) => {
-  let pizze_collection = db.collection("pizze");
-  let allPizze = await pizze_collection.find().toArray();
-  res.status(200).json(allPizze);
+  const pizze_collection = db.collection("pizze");
+  const { cijena, cijena_min, cijena_max } = req.query;
+
+  try {
+    let filter = {};
+
+    if (cijena) {
+      // točna cijena
+      filter.cijena = Number(cijena);
+    } else {
+      // raspon
+      if (cijena_min) filter.cijena = { $gte: Number(cijena_min) };
+      if (cijena_max) {
+        filter.cijena = filter.cijena
+          ? { ...filter.cijena, $lte: Number(cijena_max) }
+          : { $lte: Number(cijena_max) };
+      }
+    }
+
+    const pizze = await pizze_collection.find(filter).toArray();
+    res.status(200).json(pizze);
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ error: error.message });
+  }
 });
 
 app.get("/pizze/:naziv", async (req, res) => {
@@ -66,7 +88,7 @@ app.patch("/pizze/:naziv", async (req, res) => {
 });
 
 app.put("/pizze", async (req, res) => {
-  let pizze_collection = db.collection("/pizze");
+  let pizze_collection = db.collection("pizze");
   let noviMeni = req.body;
 
   try {
@@ -76,6 +98,31 @@ app.put("/pizze", async (req, res) => {
   } catch (error) {
     console.log(error.errorResponse);
     res.status(400).send({ error: errorResponse });
+  }
+});
+
+app.delete("/pizze/:naziv", async (req, res) => {
+  let pizze_collection = db.collection("pizze");
+  let naziv_param = req.params.naziv;
+
+  try {
+    let result = await pizze_collection.deleteOne({ naziv: naziv_param });
+    res.status(200).json({ deletedCount: result.deletedCount });
+  } catch (error) {
+    console.log(error.errorResponse);
+    res.status(400).json({ error: error.errorResponse });
+  }
+});
+
+app.delete("/pizze", async (req, res) => {
+  let pizze_collection = db.collection("pizze");
+
+  try {
+    let result = await pizze_collection.deleteMany({});
+    res.status(200).json({ deletedCount: result.deletedCount });
+  } catch (error) {
+    console.log(error.errorResponse);
+    res.status(400).json({ error: error.errorResponse });
   }
 });
 
