@@ -2,41 +2,50 @@ import express from "express";
 
 const router = express.Router();
 
-// budući da se mounta na /pizze, ovdje ide "/"
+
 router.get("/", async (req, res) => {
   const pizze_collection = req.db.collection("pizze");
-  const { naziv, cijena, cijena_min, cijena_max, sort } = req.query;
+
+  // svi moguci query parametri
+  const { naziv, cijena_min, cijena_max, sort } = req.query;
 
   try {
     const filter = {};
 
+    // 1. pretrazivanje po nazivu (djelomicno podudaranje, case-insensitive) 
     if (naziv) {
       filter.naziv = { $regex: naziv, $options: "i" };
     }
 
-    const priceFieldPaths = ["cijena", "cijene.mala", "cijene.srednja", "cijene.jumbo"];
+    // 2. Filtriranje po cijeni
+    // cijena je objekt pa me zanima upada li BILO KOJA velicina u raspon.
+    if (cijena_min || cijena_max) {
+      const criteria = {};
 
-    if (cijena) {
-      const price = Number(cijena);
-      filter.$or = priceFieldPaths.map((p) => ({ [p]: price }));
-    } else if (cijena_min || cijena_max) {
-      const min = cijena_min ? Number(cijena_min) : undefined;
-      const max = cijena_max ? Number(cijena_max) : undefined;
+      if (cijena_min) criteria.$gte = parseFloat(cijena_min);
+      if (cijena_max) criteria.$lte = parseFloat(cijena_max);
 
-      const rangeCond = {};
-      if (!Number.isNaN(min)) rangeCond.$gte = min;
-      if (!Number.isNaN(max)) rangeCond.$lte = max;
-
-      if (Object.keys(rangeCond).length) {
-        filter.$or = priceFieldPaths.map((p) => ({ [p]: rangeCond }));
-      }
+      // $or provjerava sve tri veličine.
+      filter.$or = [
+        { "cijene.mala": criteria },
+        { "cijene.srednja": criteria },
+        { "cijene.jumbo": criteria },
+      ];
     }
 
+    // Sortiranje
     const sortOptions = {};
-    if (sort === "asc") sortOptions["cijene.mala"] = 1;
-    else if (sort === "desc") sortOptions["cijene.mala"] = -1;
+    if (sort) {
+      const direction = sort === "desc" ? -1 : 1;
+      sortOptions["cijene.mala"] = direction;
+    }
 
-    const pizze = await pizze_collection.find(filter).sort(sortOptions).toArray();
+    // Dohvaćanje podataka s filterom i sortiranjem
+    const pizze = await pizze_collection
+      .find(filter)
+      .sort(sortOptions)
+      .toArray();
+
     res.status(200).json(pizze);
   } catch (error) {
     console.error(error);
