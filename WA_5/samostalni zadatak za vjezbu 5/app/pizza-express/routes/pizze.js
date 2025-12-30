@@ -25,7 +25,7 @@ router.get("/", async (req, res) => {
       if (cijena_min) criteria.$gte = parseFloat(cijena_min);
       if (cijena_max) criteria.$lte = parseFloat(cijena_max);
 
-      // $or provjerava sve tri veličine.
+      // $or provjerava sve tri velicine.
       filter.$or = [
         { "cijene.mala": criteria },
         { "cijene.srednja": criteria },
