@@ -5,23 +5,38 @@ const router = express.Router();
 // budući da se mounta na /pizze, ovdje ide "/"
 router.get("/", async (req, res) => {
   const pizze_collection = req.db.collection("pizze");
-  const { cijena, cijena_min, cijena_max } = req.query;
+  const { naziv, cijena, cijena_min, cijena_max, sort } = req.query;
 
   try {
-    let filter = {};
+    const filter = {};
+
+    if (naziv) {
+      filter.naziv = { $regex: naziv, $options: "i" };
+    }
+
+    const priceFieldPaths = ["cijena", "cijene.mala", "cijene.srednja", "cijene.jumbo"];
 
     if (cijena) {
-      filter.cijena = Number(cijena);
-    } else {
-      if (cijena_min) filter.cijena = { $gte: Number(cijena_min) };
-      if (cijena_max) {
-        filter.cijena = filter.cijena
-          ? { ...filter.cijena, $lte: Number(cijena_max) }
-          : { $lte: Number(cijena_max) };
+      const price = Number(cijena);
+      filter.$or = priceFieldPaths.map((p) => ({ [p]: price }));
+    } else if (cijena_min || cijena_max) {
+      const min = cijena_min ? Number(cijena_min) : undefined;
+      const max = cijena_max ? Number(cijena_max) : undefined;
+
+      const rangeCond = {};
+      if (!Number.isNaN(min)) rangeCond.$gte = min;
+      if (!Number.isNaN(max)) rangeCond.$lte = max;
+
+      if (Object.keys(rangeCond).length) {
+        filter.$or = priceFieldPaths.map((p) => ({ [p]: rangeCond }));
       }
     }
 
-    const pizze = await pizze_collection.find(filter).toArray();
+    const sortOptions = {};
+    if (sort === "asc") sortOptions["cijene.mala"] = 1;
+    else if (sort === "desc") sortOptions["cijene.mala"] = -1;
+
+    const pizze = await pizze_collection.find(filter).sort(sortOptions).toArray();
     res.status(200).json(pizze);
   } catch (error) {
     console.error(error);
@@ -51,20 +66,32 @@ router.post("/", async (req, res) => {
 
   const obavezniKljucevi = ["naziv", "sastojci", "cijena", "slika_url"];
   const kljuceviTijela = Object.keys(novaPizza);
-  
-  const sviPrisutni = obavezniKljucevi.every(kljuc => kljuceviTijela.includes(kljuc))
-  const nemaExtra = kljuceviTijela.every(kljuc => obavezniKljucevi.includes(kljuc))
+
+  const sviPrisutni = obavezniKljucevi.every((kljuc) =>
+    kljuceviTijela.includes(kljuc)
+  );
+  const nemaExtra = kljuceviTijela.every((kljuc) =>
+    obavezniKljucevi.includes(kljuc)
+  );
 
   if (!sviPrisutni || !nemaExtra) {
-    return res.status(400).json({error: 'Neispravan format podataka. Potrebni kljucevi su: naziv, sastojci, cijena, slika_url'})
+    return res.status(400).json({
+      error:
+        "Neispravan format podataka. Potrebni kljucevi su: naziv, sastojci, cijena, slika_url",
+    });
   }
 
-  if (typeof novaPizza.cijena !== 'number') {
-    return res.status(400).json({ error: "Polje 'ccijena' mora biti broj."})
+  if (typeof novaPizza.cijena !== "number") {
+    return res.status(400).json({ error: "Polje 'ccijena' mora biti broj." });
   }
 
-  if (!Array.isArray(novaPizza.sastojci) || novaPizza.sastojci.every(sastojak => typeof sastojak === 'string')) {
-    return res.status(400).json({greska: "Polje 'sastojci' mora biti niz stringova"})
+  if (
+    !Array.isArray(novaPizza.sastojci) ||
+    novaPizza.sastojci.every((sastojak) => typeof sastojak === "string")
+  ) {
+    return res
+      .status(400)
+      .json({ greska: "Polje 'sastojci' mora biti niz stringova" });
   }
 
   try {
