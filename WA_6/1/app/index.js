@@ -9,8 +9,17 @@ const timer_middleware = (req, res, next) => {
   next();
 };
 
+const requestLogger = (req, res, next) => {
+  const date = new Date().toLocaleString();
+  const method = req.method; // HTTP metoda
+  const url = req.originalUrl; // URL zahtjeva
+  console.log(`[${date}] : ${method} ${url}`);
+  next();
+};
+
 
 app.use(timer_middleware);
+app.use(requestLogger);
 app.use(express.json());
 app.use('/korisnici', korisniciRouter)
 
