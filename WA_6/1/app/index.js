@@ -1,6 +1,5 @@
 import express from "express";
-import korisniciRouter from "./routes/korisnici.js"
-
+import korisniciRouter from "./routes/korisnici.js";
 
 const app = express();
 
@@ -17,21 +16,16 @@ const requestLogger = (req, res, next) => {
   next();
 };
 
-
 app.use(timer_middleware);
 app.use(requestLogger);
 app.use(express.json());
-app.use('/korisnici', korisniciRouter)
+app.use("/korisnici", korisniciRouter);
 
 let PORT = 3000;
-
 
 app.get("/", (req, res) => {
   res.status(200).send("Root endpoint posluzitelja");
 });
-
-
-
 
 app.listen(PORT, (error) => {
   if (error) {
