@@ -6,6 +6,9 @@ import cors from "cors";
 import { connectToDatabase } from "./db.js";
 import { ObjectId } from "mongodb";
 import authRouter from "./routes/auth.js"
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const app = express();
 const PORT = 3000;
