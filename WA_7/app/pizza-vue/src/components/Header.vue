@@ -28,6 +28,12 @@
           Home
         </router-link>
         <router-link 
+          to="/login" 
+          class="text-sm font-medium text-slate-200 hover:text-orange-400 transition-colors"
+        >
+          Prijava
+        </router-link>
+        <router-link 
           to="/register" 
           class="text-sm font-medium text-slate-200 hover:text-orange-400 transition-colors"
         >
