@@ -41,6 +41,13 @@
         >
           Registracija
         </router-link>
+        <router-link 
+          v-if="isLoggedIn"
+          to="/narudzbe" 
+          class="text-sm font-medium text-slate-200 hover:text-orange-400 transition-colors"
+        >
+          Moje narudžbe
+        </router-link>
         <button
           v-if="isLoggedIn"
           type="button"
