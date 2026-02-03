@@ -58,6 +58,7 @@ router.post("/", authMiddleware, async (req, res) => {
     }
   }
 
+  
   if (
     !novaNarudzba.narucene_pizze.every((stavka) => {
       return (
