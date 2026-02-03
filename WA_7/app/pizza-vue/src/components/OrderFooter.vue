@@ -21,7 +21,7 @@
 
     <!-- Forma za dostavu -->
     <div class="mb-4 pb-4 border-b border-slate-600">
-      <DeliveryForm v-model:prezime="prezime" v-model:adresa="adresa" v-model:telefon="telefon" />
+      <DeliveryForm v-model:ime="ime" v-model:adresa="adresa" v-model:telefon="telefon" />
     </div>
 
     <!-- Ostatak elemenata -->
@@ -140,10 +140,10 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import axios from 'axios'
 import DeliveryForm from './DeliveryForm.vue'
+import api from '../services/api'
 
-const prezime = ref('')
+const ime = ref('')
 const adresa = ref('')
 const telefon = ref('')
 const statusPoruka = ref(null)
@@ -160,7 +160,6 @@ const emit = defineEmits(['close'])
 const odabranaVelicina = ref(Object.keys(props.odabranaPizza.cijene)[0])
 const narucene_pizze = ref([])
 const odabranaKolicina = ref(1)
-const URL_express = 'http://localhost:3000'
 
 const ukupna_cijena_stavke = computed(() => {
   const cijenaPoKomadu = props.odabranaPizza.cijene[odabranaVelicina.value]
@@ -199,22 +198,26 @@ async function naruciPizze() {
         }
       return
     }
-    if (!prezime.value.trim() || !adresa.value.trim() || !telefon.value.trim()) {
+    if (!ime.value.trim() || !adresa.value.trim() || !telefon.value.trim()) {
       statusPoruka.value = {
         tip: 'error',
-        tekst: 'Molim unesite sve podatke za dostavu (prezime, adresa, telefon).'
+        tekst: 'Molim unesite sve podatke za dostavu (ime, adresa, telefon).'
       }
       return
     }
 
-    const rezultat = await axios.post(`${URL_express}/narudzbe`, {
-      narucene_pizze: narucene_pizze.value,
-      podaci_dostava: {
-        prezime: prezime.value.trim(),
-        adresa: adresa.value.trim(),
-        telefon: telefon.value.trim(),
-      },
-    })
+    const payload = {
+      ime: ime.value.trim(),
+      adresa: adresa.value.trim(),
+      telefon: telefon.value.trim(),
+      narucene_pizze: narucene_pizze.value.map((stavka) => ({
+        naziv: stavka.naziv,
+        'količina': stavka.kolicina,
+        'veličina': stavka.velicina,
+      })),
+    }
+
+    const rezultat = await api.post('/narudzbe', payload)
 
     console.log('Narudžba uspješno poslana:', rezultat.data)
     statusPoruka.value = {
@@ -225,7 +228,7 @@ async function naruciPizze() {
     // ocisti kosaricu i formu nakon 3 sekunde
     setTimeout(() => {
         narucene_pizze.value = []
-        prezime.value = ''
+        ime.value = ''
         adresa.value = ''
         telefon.value = ''
         statusPoruka.value = null
@@ -234,8 +237,10 @@ async function naruciPizze() {
   } catch (error) {
     console.log(`Greska prilikom narucivanja: ${error}`)
     statusPoruka.value = {
-        tip: 'error',
-        tekst: error.response?.data?.message || 'Došlo je do greške pri slanju narudžbe. Molimo pokušajte ponovno.' 
+      tip: 'error',
+      tekst:
+        error.response?.data?.error ||
+        'Došlo je do greške pri slanju narudžbe. Molimo pokušajte ponovno.',
     }
   }
 }

@@ -28,17 +28,27 @@
           Home
         </router-link>
         <router-link 
+          v-if="!isLoggedIn"
           to="/login" 
           class="text-sm font-medium text-slate-200 hover:text-orange-400 transition-colors"
         >
           Prijava
         </router-link>
         <router-link 
+          v-if="!isLoggedIn"
           to="/register" 
           class="text-sm font-medium text-slate-200 hover:text-orange-400 transition-colors"
         >
           Registracija
         </router-link>
+        <button
+          v-if="isLoggedIn"
+          type="button"
+          @click="handleLogout"
+          class="text-sm font-medium text-slate-200 hover:text-orange-400 transition-colors"
+        >
+          Odjava
+        </button>
       </nav>
 
       <!-- Right: Address -->
@@ -50,4 +60,32 @@
   </header>
 </template>
 
-<script setup></script>
+<script setup>
+import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const isLoggedIn = ref(!!localStorage.getItem('token'))
+
+const updateAuthState = () => {
+  isLoggedIn.value = !!localStorage.getItem('token')
+}
+
+const handleLogout = () => {
+  localStorage.removeItem('token')
+  localStorage.removeItem('user')
+  updateAuthState()
+  window.dispatchEvent(new Event('auth-changed'))
+  router.push('/')
+}
+
+onMounted(() => {
+  window.addEventListener('storage', updateAuthState)
+  window.addEventListener('auth-changed', updateAuthState)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('storage', updateAuthState)
+  window.removeEventListener('auth-changed', updateAuthState)
+})
+</script>

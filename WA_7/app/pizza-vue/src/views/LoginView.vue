@@ -28,6 +28,8 @@
 </template>
 
 <script>
+import api from '../services/api'
+
 export default {
   name: 'LoginView',
   data() {
@@ -41,36 +43,28 @@ export default {
   methods: {
     async handleLogin() {
       try {
-        const response = await fetch("http://localhost:3000/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            username: this.username, 
-            password: this.password 
-          }),
-        });
+        const { data } = await api.post('/auth/login', {
+          username: this.username,
+          password: this.password,
+        })
 
-        const data = await response.json();
-
-        if (response.ok) {
+        if (data?.token) {
           this.messageType = 'success';
           this.message = data.message;
           
           // Spremi token u localStorage
           localStorage.setItem('token', data.token);
           localStorage.setItem('user', JSON.stringify(data.user));
+          window.dispatchEvent(new Event('auth-changed'));
           
           // Preusmjeri na home nakon prijave
           setTimeout(() => {
             this.$router.push('/');
           }, 1000);
-        } else {
-          this.messageType = 'error';
-          this.message = data.error;
         }
       } catch (error) {
         this.messageType = 'error';
-        this.message = "Greška pri povezivanju sa poslužiteljem";
+        this.message = error.response?.data?.error || "Greška pri povezivanju sa poslužiteljem";
       }
     }
   }

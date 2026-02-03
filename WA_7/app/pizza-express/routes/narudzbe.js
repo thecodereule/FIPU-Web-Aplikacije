@@ -1,11 +1,44 @@
 import express from "express";
+import { ObjectId } from "mongodb";
+import { authMiddleware } from "../middleware/auth.js";
 
 const router = express.Router();
 
+// GET /narudzbe - Dohvat svih narudžbi autoriziranog korisnika
+router.get("/", authMiddleware, async (req, res) => {
+  try {
+    const narudzbe_collection = req.db.collection("narudzbe");
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      return res.status(401).json({ error: "Token nije valjan" });
+    }
+
+    const userFilter = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
+
+    const narudzbe = await narudzbe_collection
+      .find({ userId: userFilter })
+      .toArray();
+
+    return res.json(narudzbe);
+  } catch (error) {
+    return res.status(500).json({ error: "Greška pri dohvaćanju narudžbi" });
+  }
+});
+
 // POST /narudzbe - Izrada nove narudžbe pizza
-router.post("/", async (req, res) => {
+router.post("/", authMiddleware, async (req, res) => {
   let narudzbe_collection = req.db.collection("narudzbe");
   let novaNarudzba = req.body;
+  const userId = req.user?.userId;
+
+  if (!userId) {
+    return res.status(401).json({ error: "Token nije valjan" });
+  }
+
+  // Ne vjeruj podacima iz klijenta za cijenu ili userId
+  delete novaNarudzba.ukupna_cijena;
+  delete novaNarudzba.userId;
 
   let obavezniKljucevi = ["ime", "adresa", "telefon", "narucene_pizze"];
   let obavezniKljuceviStavke = ["naziv", "količina", "veličina"];
@@ -30,7 +63,7 @@ router.post("/", async (req, res) => {
       return (
         Number.isInteger(stavka.količina) &&
         stavka.količina > 0 &&
-        ["mala", "srednja", "velika"].includes(stavka.veličina)
+        ["mala", "srednja", "jumbo"].includes(stavka.veličina)
       );
     })
   ) {
@@ -67,6 +100,8 @@ router.post("/", async (req, res) => {
 
   // dodaj ukupna_cijena u narudzbu
   novaNarudzba.ukupna_cijena = ukupna_cijena;
+  novaNarudzba.userId = ObjectId.isValid(userId) ? new ObjectId(userId) : userId;
+  novaNarudzba.createdAt = new Date();
 
   try {
     let result = await narudzbe_collection.insertOne(novaNarudzba);

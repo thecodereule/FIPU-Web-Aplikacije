@@ -3,9 +3,9 @@
   <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
     <input
       type="text"
-      placeholder="Prezime *"
-      :value="prezime"
-      @input="emit('update:prezime', $event.target.value)"
+      placeholder="Ime i prezime *"
+      :value="ime"
+      @input="emit('update:ime', $event.target.value)"
       class="w-full sm:w-48 px-3 py-2 rounded-md bg-slate-600/40 border border-slate-500 text-white text-sm outline-none focus:border-orange-400"
     />
     <input
@@ -27,9 +27,9 @@
 
 <script setup>
 const props = defineProps({
-  prezime: String,
+  ime: String,
   adresa: String,
   telefon: String,
 })
-const emit = defineEmits(['update:prezime', 'update:adresa', 'update:telefon'])
+const emit = defineEmits(['update:ime', 'update:adresa', 'update:telefon'])
 </script>
