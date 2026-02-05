@@ -5,7 +5,7 @@
     <button
       @click="emit('close')"
       class="absolute top-2 right-2 text-slate-300 hover:text-white text-xl font-bold cursor-pointer"
-    >
+    > 
       ×
     </button>
 
